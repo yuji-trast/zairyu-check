@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在留資格チェックサービス｜AI行政書士</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1f3c;
+    --navy-mid: #162d52;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f7f3ed;
+    --cream-dark: #ede8df;
+    --text: #1a1a2e;
+    --text-light: #5a5a7a;
+    --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--cream); color: var(--text); overflow-x: hidden; }
+
+  /* LANG SWITCHER */
+  .lang-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(13,31,60,0.97);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 24px;
+    gap: 6px;
+  }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .lang-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .lang-btn.active { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 700; }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 100px 24px 60px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(201,168,76,0.07) 0%, transparent 60%);
+  }
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid var(--gold); color: var(--gold);
+    font-size: 11px; letter-spacing: 0.2em;
+    padding: 6px 18px; border-radius: 2px; margin-bottom: 32px;
+    font-weight: 500; animation: fadeUp 0.8s ease both;
+  }
+  .hero-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.8rem, 5vw, 3.5rem);
+    font-weight: 700; color: var(--white);
+    line-height: 1.35; margin-bottom: 12px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .hero-title span { color: var(--gold-light); }
+  .hero-sub {
+    font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+    color: rgba(255,255,255,0.6); margin-bottom: 48px;
+    font-weight: 300; animation: fadeUp 0.8s 0.2s ease both;
+    max-width: 560px;
+  }
+  .hero-cta {
+    display: inline-block;
+    background: var(--gold); color: var(--navy);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem; font-weight: 700;
+    padding: 18px 48px; border-radius: 3px;
+    text-decoration: none; letter-spacing: 0.05em;
+    transition: background 0.2s, transform 0.2s;
+    animation: fadeUp 0.8s 0.3s ease both; margin-bottom: 16px;
+  }
+  .hero-cta:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .hero-price { color: rgba(255,255,255,0.5); font-size: 0.85rem; animation: fadeUp 0.8s 0.4s ease both; }
+  .hero-price strong { color: var(--gold-light); font-size: 1.1rem; }
+  .hero-scroll {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.3); font-size: 10px; letter-spacing: 0.15em;
+    animation: bounce 2s infinite;
+  }
+  .hero-scroll::after {
+    content: ''; display: block; width: 1px; height: 40px;
+    background: linear-gradient(to bottom, rgba(201,168,76,0.5), transparent);
+  }
+
+  /* SECTIONS */
+  .problems { background: var(--cream-dark); padding: 80px 24px; }
+  .section-label { text-align: center; font-size: 11px; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 16px; font-weight: 500; }
+  .section-title {
+    text-align: center; font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.4rem, 3.5vw, 2rem); font-weight: 700;
+    margin-bottom: 48px; color: var(--navy); line-height: 1.5;
+  }
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+  .problem-card { background: var(--white); border-left: 3px solid var(--gold); padding: 24px 28px; border-radius: 2px; }
+  .problem-card .icon { font-size: 1.5rem; margin-bottom: 12px; }
+  .problem-card p { font-size: 0.92rem; line-height: 1.75; color: var(--text); }
+
+  .solution { background: var(--navy); padding: 80px 24px; position: relative; overflow: hidden; }
+  .solution::before { content: ''; position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(201,168,76,0.1); }
+  .solution .section-title { color: var(--white); }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; max-width: 800px; margin: 0 auto; position: relative; }
+  .step { text-align: center; padding: 32px 20px; position: relative; }
+  .step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: var(--gold); font-size: 1.2rem; }
+  .step-num { width: 48px; height: 48px; border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--gold); }
+  .step h3 { font-family: 'Noto Serif JP', serif; font-size: 1rem; color: var(--white); margin-bottom: 8px; }
+  .step p { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+  .deliverables { background: var(--cream); padding: 80px 24px; }
+  .deliverable-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  .deliverable-item { display: flex; align-items: flex-start; gap: 16px; background: var(--white); padding: 20px 24px; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+  .deliverable-item .check { width: 28px; height: 28px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; color: var(--navy); font-weight: 700; }
+  .deliverable-item div h4 { font-family: 'Noto Serif JP', serif; font-size: 1rem; margin-bottom: 4px; color: var(--navy); }
+  .deliverable-item div p { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+
+  .pricing { background: var(--navy-mid); padding: 80px 24px; text-align: center; }
+  .pricing .section-title { color: var(--white); }
+  .price-card { max-width: 420px; margin: 0 auto; background: var(--cream); border-radius: 6px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .price-card-header { background: var(--gold); padding: 28px; }
+  .price-card-header h3 { font-family: 'Noto Serif JP', serif; font-size: 1.1rem; color: var(--navy); margin-bottom: 8px; }
+  .price-amount { font-family: 'DM Serif Display', serif; font-size: 3.5rem; color: var(--navy); line-height: 1; }
+  .price-amount span { font-size: 1.2rem; }
+  .price-card-body { padding: 32px 28px; }
+  .price-features { list-style: none; margin-bottom: 28px; text-align: left; }
+  .price-features li { padding: 10px 0; border-bottom: 1px solid var(--cream-dark); font-size: 0.9rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .price-features li::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+  .price-cta { display: block; background: var(--navy); color: var(--white); font-family: 'Noto Serif JP', serif; font-size: 1.05rem; font-weight: 700; padding: 16px; border-radius: 3px; text-decoration: none; transition: background 0.2s; letter-spacing: 0.05em; }
+  .price-cta:hover { background: var(--navy-mid); }
+  .price-note { margin-top: 16px; font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+  .trust { background: var(--cream-dark); padding: 60px 24px; }
+  .trust-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; max-width: 800px; margin: 0 auto; }
+  .trust-item { text-align: center; padding: 24px; }
+  .trust-item .icon { font-size: 2rem; margin-bottom: 12px; }
+  .trust-item h4 { font-family: 'Noto Serif JP', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
+  .trust-item p { font-size: 0.82rem; color: var(--text-light); line-height: 1.6; }
+
+  .faq { background: var(--cream); padding: 80px 24px; }
+  .faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  details { background: var(--white); border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden; }
+  summary { padding: 20px 24px; font-family: 'Noto Serif JP', serif; font-size: 0.95rem; color: var(--navy); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; font-size: 1.3rem; color: var(--gold); transition: transform 0.2s; flex-shrink: 0; }
+  details[open] summary::after { transform: rotate(45deg); }
+  details p { padding: 0 24px 20px; font-size: 0.88rem; color: var(--text-light); line-height: 1.8; }
+
+  .cta-final { background: var(--navy); padding: 80px 24px; text-align: center; position: relative; overflow: hidden; }
+  .cta-final::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%); }
+  .cta-final h2 { font-family: 'Noto Serif JP', serif; font-size: clamp(1.4rem, 3.5vw, 2rem); color: var(--white); margin-bottom: 12px; position: relative; }
+  .cta-final p { color: rgba(255,255,255,0.5); margin-bottom: 36px; font-size: 0.95rem; position: relative; }
+  .cta-final a { display: inline-block; background: var(--gold); color: var(--navy); font-family: 'Noto Serif JP', serif; font-size: 1.1rem; font-weight: 700; padding: 20px 56px; border-radius: 3px; text-decoration: none; position: relative; transition: background 0.2s, transform 0.2s; letter-spacing: 0.05em; }
+  .cta-final a:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  footer { background: #080f1e; padding: 32px 24px; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.78rem; line-height: 2; }
+  footer a { color: rgba(255,255,255,0.4); text-decoration: none; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+
+  @media (max-width: 600px) {
+    .steps { grid-template-columns: 1fr; }
+    .step:not(:last-child)::after { content: '↓'; right: 50%; top: auto; bottom: -12px; transform: translateX(50%); }
+    .step { padding-bottom: 40px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LANG SWITCHER -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('ja')">日本語</button>
+  <button class="lang-btn" onclick="setLang('en')">English</button>
+  <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">AI × 行政書士</div>
+  <h1 class="hero-title" id="hero-title"></h1>
+  <p class="hero-sub" id="hero-sub"></p>
+  <a href="#pricing" class="hero-cta" id="hero-cta"></a>
+  <p class="hero-price" id="hero-price"></p>
+  <div class="hero-scroll">SCROLL</div>
+</section>
+
+<!-- PROBLEMS -->
+<section class="problems">
+  <p class="section-label">PROBLEM</p>
+  <h2 class="section-title" id="prob-title"></h2>
+  <div class="problem-grid">
+    <div class="problem-card"><div class="icon">😰</div><p id="prob1"></p></div>
+    <div class="problem-card"><div class="icon">📋</div><p id="prob2"></p></div>
+    <div class="problem-card"><div class="icon">🔍</div><p id="prob3"></p></div>
+    <div class="problem-card"><div class="icon">💸</div><p id="prob4"></p></div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <p class="section-label">HOW IT WORKS</p>
+  <h2 class="section-title" id="how-title"></h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h3 id="step1h"></h3><p id="step1p"></p></div>
+    <div class="step"><div class="step-num">2</div><h3 id="step2h"></h3><p id="step2p"></p></div>
+    <div class="step"><div class="step-num">3</div><h3 id="step3h"></h3><p id="step3p"></p></div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="deliverables">
+  <p class="section-label">DELIVERABLES</p>
+  <h2 class="section-title" id="del-title"></h2>
+  <div class="deliverable-list">
+    <div class="deliverable-item"><div class="check">✓</div><div><h4 id="del1h"></h4><p id="del1p"></p></div></div>
+    <div class="deliverable-item"><div class="check">✓</div><div><h4 id="del2h"></h4><p id="del2p"></p></div></div>
+    <div class="deliverable-item"><div class="check">✓</div><div><h4 id="del3h"></h4><p id="del3p"></p></div></div>
+    <div class="deliverable-item"><div class="check">✓</div><div><h4 id="del4h"></h4><p id="del4p"></p></div></div>
+    <div class="deliverable-item"><div class="check">✓</div><div><h4 id="del5h"></h4><p id="del5p"></p></div></div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <p class="section-label">PRICING</p>
+  <h2 class="section-title" id="price-title"></h2>
+  <div class="price-card">
+    <div class="price-card-header">
+      <h3 id="price-pack"></h3>
+      <div class="price-amount"><span>¥</span>3,000<span id="price-tax"></span></div>
+    </div>
+    <div class="price-card-body">
+      <ul class="price-features" id="price-features"></ul>
+      <a href="#" class="price-cta" id="price-cta"></a>
+    </div>
+  </div>
+  <p class="price-note" id="price-note"></p>
+</section>
+
+<!-- TRUST -->
+<section class="trust">
+  <p class="section-label">WHY US</p>
+  <h2 class="section-title" id="trust-title"></h2>
+  <div class="trust-grid">
+    <div class="trust-item"><div class="icon">🏛️</div><h4 id="tr1h"></h4><p id="tr1p"></p></div>
+    <div class="trust-item"><div class="icon">🔒</div><h4 id="tr2h"></h4><p id="tr2p"></p></div>
+    <div class="trust-item"><div class="icon">⚡</div><h4 id="tr3h"></h4><p id="tr3p"></p></div>
+    <div class="trust-item"><div class="icon">🌏</div><h4 id="tr4h"></h4><p id="tr4p"></p></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <p class="section-label">FAQ</p>
+  <h2 class="section-title" id="faq-title"></h2>
+  <div class="faq-list" id="faq-list"></div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <h2 id="cta-h"></h2>
+  <p id="cta-p"></p>
+  <a href="#pricing" id="cta-a"></a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>トラストコンサルティング行政書士事務所｜行政書士登録番号：第２２０９０９１２号</p>
+  <p>〒２３８－００１４　神奈川県横須賀市三春町５－１０５番地１４　クリオ横須賀壱番館３F　|　yuji@tc-odanaka.com</p>
+  <p style="margin-top:12px">
+    <a href="#" id="fp1"></a> &nbsp;|&nbsp;
+    <a href="#" id="fp2"></a> &nbsp;|&nbsp;
+    <a href="#" id="fp3"></a>
+  </p>
+  <p style="margin-top:12px">© 2026 トラストコンサルティング行政書士事務所. All rights reserved.</p>
+</footer>
+
+<script>
+const t = {
+  ja: {
+    heroTitle: '在留資格、<span>本当に大丈夫</span>ですか？',
+    heroSub: 'AIと行政書士が、あなたの在留資格を徹底チェック',
+    heroCta: '今すぐチェックする',
+    heroPrice: '料金 <strong>¥3,000</strong>（税込）・オンライン完結',
+    probTitle: 'こんなお悩み、ありませんか？',
+    prob1: '自分の在留資格で<strong>本当に働けるのか</strong>、アルバイトできるのか不安',
+    prob2: '更新や変更の申請を<strong>いつまでに</strong>すればいいかわからない',
+    prob3: '入管の資料は<strong>難しい言葉ばかり</strong>で読んでも理解できない',
+    prob4: '行政書士に相談したいが、<strong>費用が高そう・敷居が高い</strong>と感じている',
+    howTitle: '3ステップで、すぐに解決',
+    step1h: 'フォーム入力', step1p: '現在の在留資格・職種・状況を入力。5分で完了。',
+    step2h: 'AIが即時分析', step2p: '入力内容をAIと行政書士が確認・チェック。',
+    step3h: 'レポート受取', step3p: '24時間以内にメールで詳細レポートをお届け。',
+    delTitle: '¥3,000でお届けする内容',
+    del1h: '在留資格の適法性チェック', del1p: '現在の就労・活動内容が在留資格の範囲内かを確認します。',
+    del2h: '更新・変更のタイミング診断', del2p: 'いつまでに何をすべきか、具体的な期限と手順をお知らせします。',
+    del3h: 'リスク判定レポート（PDF）', del3p: '「問題なし／要注意／要対応」を3段階でわかりやすく判定。',
+    del4h: '次のアクションリスト', del4p: '今すぐやること・近いうちにやることを箇条書きで整理。',
+    del5h: '行政書士への無料追加質問（1回）', del5p: 'レポート受取後、疑問点をメールで1回まで無料で質問できます。',
+    priceTitle: '料金プラン',
+    pricePack: '在留資格チェックパック',
+    priceTax: ' 税込',
+    priceFeatures: ['適法性チェック','更新・変更タイミング診断','リスク判定レポート（PDF）','次のアクションリスト','行政書士への追加質問1回無料','24時間以内にメール納品','完全オンライン・来所不要'],
+    priceCta: 'チェックをはじめる →',
+    priceNote: '※ クレジットカードのみ対応（Visa / Mastercard / JCB）。領収書発行可。',
+    trustTitle: '安心の理由',
+    tr1h: '行政書士が監修', tr1p: 'AIの分析結果を有資格者が最終確認。登録番号を明示しています。',
+    tr2h: '個人情報保護', tr2p: 'SSL暗号化通信。入力情報は目的外に利用しません。',
+    tr3h: '最短当日対応', tr3p: '平日受付分は当日〜24時間以内にレポートをお届けします。',
+    tr4h: '多言語対応', tr4p: '英語・ベトナム語でもご利用いただけます。',
+    faqTitle: 'よくある質問',
+    faqs: [
+      ['日本語が得意でなくても利用できますか？','はい。フォームは日本語・英語・ベトナム語に対応しています。レポートも希望言語でお届けします。'],
+      ['どんな在留資格でも対応できますか？','技術・人文知識・国際業務、留学、特定技能、家族滞在など主要な在留資格に対応しています。対応範囲外の場合は全額返金いたします。'],
+      ['結果はいつ届きますか？','平日受付分は原則24時間以内、土日祝受付分は翌営業日中にメールでお届けします。'],
+      ['このチェックは法的効力がありますか？','本サービスは専門家によるアドバイスであり、入管当局の判断を保証するものではありません。ただし、行政書士が確認した信頼性の高い情報を提供します。'],
+      ['支払い方法は？','クレジットカードのみ対応しています（Visa / Mastercard / JCB）。領収書の発行も可能です。'],
+    ],
+    ctaH: 'まず、確認するところから。',
+    ctaP: '不安をそのままにしていると、気づかないうちに違反になることも。今すぐ確認しましょう。',
+    ctaA: '在留資格をチェックする（¥3,000）',
+    fp1: 'プライバシーポリシー', fp2: '特定商取引法に基づく表記', fp3: '利用規約',
+  },
+  en: {
+    heroTitle: 'Is Your <span>Residence Status</span> Really OK?',
+    heroSub: 'AI + Licensed Administrative Scrivener checks your visa status thoroughly',
+    heroCta: 'Check Now',
+    heroPrice: 'Fee: <strong>¥3,000</strong> (tax incl.) · 100% Online',
+    probTitle: 'Do any of these sound familiar?',
+    prob1: 'Unsure whether you can <strong>legally work or part-time</strong> with your current visa',
+    prob2: 'Don\'t know <strong>when to apply</strong> for renewal or status change',
+    prob3: 'Immigration documents are <strong>hard to understand</strong> even after reading them',
+    prob4: 'Want professional advice but find it <strong>expensive or intimidating</strong>',
+    howTitle: 'Resolved in 3 Simple Steps',
+    step1h: 'Fill the Form', step1p: 'Enter your visa type, job, and situation. Takes just 5 minutes.',
+    step2h: 'AI Analysis', step2p: 'AI and a licensed scrivener review your information.',
+    step3h: 'Receive Report', step3p: 'A detailed report delivered to your email within 24 hours.',
+    delTitle: 'What You Get for ¥3,000',
+    del1h: 'Legality Check', del1p: 'We verify whether your current work or activities are within your visa scope.',
+    del2h: 'Renewal & Change Timing', del2p: 'Exact deadlines and procedures for what you need to do and when.',
+    del3h: 'Risk Assessment Report (PDF)', del3p: 'Clear 3-level verdict: No Issue / Caution / Action Required.',
+    del4h: 'Action Item List', del4p: 'Prioritized list of what to do now and what to do soon.',
+    del5h: 'Free Follow-up Question (×1)', del5p: 'After receiving your report, ask one follow-up question by email at no extra cost.',
+    priceTitle: 'Pricing',
+    pricePack: 'Residence Status Check Pack',
+    priceTax: ' incl. tax',
+    priceFeatures: ['Legality check','Renewal & change timing diagnosis','Risk assessment report (PDF)','Action item list','1 free follow-up question','Email delivery within 24hrs','Fully online — no office visit needed'],
+    priceCta: 'Get Started →',
+    priceNote: '* Credit card only (Visa / Mastercard / JCB). Receipt available.',
+    trustTitle: 'Why Trust Us',
+    tr1h: 'Licensed Professional', tr1p: 'All AI results are reviewed by a certified administrative scrivener with a disclosed registration number.',
+    tr2h: 'Data Privacy', tr2p: 'SSL-encrypted. Your information is never used for any other purpose.',
+    tr3h: 'Same-Day Response', tr3p: 'Weekday submissions delivered within 24 hours, often the same day.',
+    tr4h: 'Multilingual Support', tr4p: 'Available in Japanese, English, and Vietnamese.',
+    faqTitle: 'Frequently Asked Questions',
+    faqs: [
+      ['Can I use this if my Japanese is not strong?','Yes. The form and report are available in Japanese, English, and Vietnamese.'],
+      ['Which visa types do you cover?','We cover most common types: Engineer/Specialist, Student, Specified Skilled Worker, Dependent, and more. If your type is outside scope, we issue a full refund.'],
+      ['When will I receive the results?','Within 24 hours for weekday submissions; next business day for weekends/holidays.'],
+      ['Does this report have legal effect?','This is professional advice, not a guarantee of immigration authority decisions. However, it is based on a licensed expert\'s review.'],
+      ['What payment methods are accepted?','Credit card only (Visa, Mastercard, JCB). Receipts available on request.'],
+    ],
+    ctaH: 'Start with a check.',
+    ctaP: 'Unaddressed issues can quietly become violations. Find out where you stand today.',
+    ctaA: 'Check Your Residence Status (¥3,000)',
+    fp1: 'Privacy Policy', fp2: 'Specified Commercial Transaction Act', fp3: 'Terms of Use',
+  },
+  vi: {
+    heroTitle: 'Tư cách lưu trú của bạn <span>có thực sự ổn không?</span>',
+    heroSub: 'AI cùng hành chính thư ký có chứng chỉ kiểm tra kỹ tư cách lưu trú của bạn',
+    heroCta: 'Kiểm Tra Ngay',
+    heroPrice: 'Phí: <strong>¥3,000</strong> (đã bao gồm thuế) · Hoàn toàn trực tuyến',
+    probTitle: 'Bạn có đang gặp những vấn đề này không?',
+    prob1: 'Không chắc liệu mình có thể <strong>đi làm hoặc làm thêm</strong> với tư cách lưu trú hiện tại',
+    prob2: 'Không biết <strong>khi nào cần nộp</strong> hồ sơ gia hạn hoặc thay đổi tư cách',
+    prob3: 'Tài liệu của Cục quản lý xuất nhập cảnh <strong>rất khó hiểu</strong> dù đã đọc',
+    prob4: 'Muốn tư vấn chuyên môn nhưng thấy <strong>tốn kém hoặc ngại ngùng</strong>',
+    howTitle: 'Giải quyết chỉ trong 3 bước đơn giản',
+    step1h: 'Điền Form', step1p: 'Nhập tư cách lưu trú, nghề nghiệp và tình trạng hiện tại. Chỉ mất 5 phút.',
+    step2h: 'AI Phân Tích', step2p: 'AI và hành chính thư ký có chứng chỉ xem xét thông tin của bạn.',
+    step3h: 'Nhận Báo Cáo', step3p: 'Báo cáo chi tiết gửi qua email trong vòng 24 giờ.',
+    delTitle: 'Bạn nhận được gì với ¥3,000',
+    del1h: 'Kiểm tra tính hợp pháp', del1p: 'Xác nhận xem công việc hoặc hoạt động hiện tại của bạn có nằm trong phạm vi tư cách lưu trú không.',
+    del2h: 'Chẩn đoán thời điểm gia hạn / thay đổi', del2p: 'Thông báo thời hạn cụ thể và các bước cần thực hiện.',
+    del3h: 'Báo cáo đánh giá rủi ro (PDF)', del3p: 'Kết luận rõ ràng 3 mức: Không vấn đề / Cần chú ý / Cần xử lý.',
+    del4h: 'Danh sách hành động tiếp theo', del4p: 'Tổng hợp những việc cần làm ngay và những việc cần làm sớm.',
+    del5h: 'Câu hỏi miễn phí sau khi nhận báo cáo (×1)', del5p: 'Sau khi nhận báo cáo, bạn có thể hỏi thêm 1 câu qua email miễn phí.',
+    priceTitle: 'Bảng Giá',
+    pricePack: 'Gói Kiểm Tra Tư Cách Lưu Trú',
+    priceTax: ' đã bao gồm thuế',
+    priceFeatures: ['Kiểm tra tính hợp pháp','Chẩn đoán thời điểm gia hạn/thay đổi','Báo cáo đánh giá rủi ro (PDF)','Danh sách hành động tiếp theo','1 câu hỏi miễn phí sau báo cáo','Giao qua email trong 24 giờ','Hoàn toàn trực tuyến — không cần đến văn phòng'],
+    priceCta: 'Bắt Đầu Kiểm Tra →',
+    priceNote: '* Chỉ chấp nhận thẻ tín dụng (Visa, Mastercard, JCB). Có thể cấp hóa đơn.',
+    trustTitle: 'Tại Sao Tin Tưởng Chúng Tôi',
+    tr1h: 'Chuyên gia có chứng chỉ', tr1p: 'Kết quả AI được kiểm tra bởi hành chính thư ký có chứng chỉ, với số đăng ký công khai.',
+    tr2h: 'Bảo vệ thông tin cá nhân', tr2p: 'Mã hóa SSL. Thông tin của bạn không được dùng cho mục đích khác.',
+    tr3h: 'Phản hồi trong ngày', tr3p: 'Hồ sơ nhận trong ngày làm việc được xử lý trong vòng 24 giờ.',
+    tr4h: 'Hỗ trợ đa ngôn ngữ', tr4p: 'Có thể sử dụng bằng tiếng Nhật, tiếng Anh và tiếng Việt.',
+    faqTitle: 'Câu Hỏi Thường Gặp',
+    faqs: [
+      ['Tôi có thể dùng dịch vụ này dù tiếng Nhật không tốt không?','Có. Form và báo cáo đều có sẵn bằng tiếng Nhật, tiếng Anh và tiếng Việt.'],
+      ['Dịch vụ hỗ trợ những loại tư cách lưu trú nào?','Chúng tôi hỗ trợ các loại phổ biến như Kỹ thuật/Nhân văn/Quốc tế, Du học, Kỹ năng đặc định, Đồng cư thân nhân và nhiều loại khác. Nếu nằm ngoài phạm vi, chúng tôi hoàn tiền toàn bộ.'],
+      ['Khi nào tôi nhận được kết quả?','Trong vòng 24 giờ với hồ sơ nhận vào ngày làm việc; ngày làm việc tiếp theo với hồ sơ nhận cuối tuần/ngày lễ.'],
+      ['Báo cáo này có giá trị pháp lý không?','Đây là tư vấn chuyên môn, không đảm bảo quyết định của Cục quản lý xuất nhập cảnh. Tuy nhiên, nội dung dựa trên đánh giá của chuyên gia có chứng chỉ.'],
+      ['Có thể thanh toán bằng cách nào?','Chỉ chấp nhận thẻ tín dụng (Visa, Mastercard, JCB). Có thể cấp hóa đơn khi có yêu cầu.'],
+    ],
+    ctaH: 'Hãy bắt đầu bằng một lần kiểm tra.',
+    ctaP: 'Nếu để mặc sự lo lắng, bạn có thể vi phạm mà không hay biết. Hãy kiểm tra ngay hôm nay.',
+    ctaA: 'Kiểm Tra Tư Cách Lưu Trú (¥3,000)',
+    fp1: 'Chính sách bảo mật', fp2: 'Luật giao dịch thương mại đặc định', fp3: 'Điều khoản sử dụng',
+  }
+};
+
+function setLang(lang) {
+  const d = t[lang];
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.documentElement.lang = lang;
+
+  document.getElementById('hero-title').innerHTML = d.heroTitle;
+  document.getElementById('hero-sub').textContent = d.heroSub;
+  document.getElementById('hero-cta').textContent = d.heroCta;
+  document.getElementById('hero-price').innerHTML = d.heroPrice;
+  document.getElementById('prob-title').textContent = d.probTitle;
+  document.getElementById('prob1').innerHTML = d.prob1;
+  document.getElementById('prob2').innerHTML = d.prob2;
+  document.getElementById('prob3').innerHTML = d.prob3;
+  document.getElementById('prob4').innerHTML = d.prob4;
+  document.getElementById('how-title').textContent = d.howTitle;
+  document.getElementById('step1h').textContent = d.step1h;
+  document.getElementById('step1p').textContent = d.step1p;
+  document.getElementById('step2h').textContent = d.step2h;
+  document.getElementById('step2p').textContent = d.step2p;
+  document.getElementById('step3h').textContent = d.step3h;
+  document.getElementById('step3p').textContent = d.step3p;
+  document.getElementById('del-title').textContent = d.delTitle;
+  document.getElementById('del1h').textContent = d.del1h;
+  document.getElementById('del1p').textContent = d.del1p;
+  document.getElementById('del2h').textContent = d.del2h;
+  document.getElementById('del2p').textContent = d.del2p;
+  document.getElementById('del3h').textContent = d.del3h;
+  document.getElementById('del3p').textContent = d.del3p;
+  document.getElementById('del4h').textContent = d.del4h;
+  document.getElementById('del4p').textContent = d.del4p;
+  document.getElementById('del5h').textContent = d.del5h;
+  document.getElementById('del5p').textContent = d.del5p;
+  document.getElementById('price-title').textContent = d.priceTitle;
+  document.getElementById('price-pack').textContent = d.pricePack;
+  document.getElementById('price-tax').textContent = d.priceTax;
+  const ul = document.getElementById('price-features');
+  ul.innerHTML = d.priceFeatures.map(f => `<li>${f}</li>`).join('');
+  document.getElementById('price-cta').textContent = d.priceCta;
+  document.getElementById('price-note').textContent = d.priceNote;
+  document.getElementById('trust-title').textContent = d.trustTitle;
+  document.getElementById('tr1h').textContent = d.tr1h;
+  document.getElementById('tr1p').textContent = d.tr1p;
+  document.getElementById('tr2h').textContent = d.tr2h;
+  document.getElementById('tr2p').textContent = d.tr2p;
+  document.getElementById('tr3h').textContent = d.tr3h;
+  document.getElementById('tr3p').textContent = d.tr3p;
+  document.getElementById('tr4h').textContent = d.tr4h;
+  document.getElementById('tr4p').textContent = d.tr4p;
+  document.getElementById('faq-title').textContent = d.faqTitle;
+  const faqList = document.getElementById('faq-list');
+  faqList.innerHTML = d.faqs.map(([q,a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('');
+  document.getElementById('cta-h').textContent = d.ctaH;
+  document.getElementById('cta-p').textContent = d.ctaP;
+  document.getElementById('cta-a').textContent = d.ctaA;
+  document.getElementById('fp1').textContent = d.fp1;
+  document.getElementById('fp2').textContent = d.fp2;
+  document.getElementById('fp3').textContent = d.fp3;
+}
+
+setLang('ja');
+</script>
+</body>
+</html>
